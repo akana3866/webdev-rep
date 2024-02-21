@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>Design Your own Hogwarts!</title>
+    <style type="text/css">
+      .icon{
+        width: 32px;
+        height: 32px;
+        float:left;
+        background-size:contain;
+        background-repeat:no-repeat;
+        cursor:pointer;
+      }
+      .icon:hover{
+        background-color:lightgray;
+      }
+      #text{
+        text-align: center;
+      }
+      #left{
+        width: 320px;
+        height:320px;
+        border:1px solid black;
+        float:left;
+      }
+      #right{
+        display: flex;
+        flex-wrap:wrap;
+        flex-direction: row;
+        padding:2px;
+        position:inherit;
+        flex-wrap:wrap;
+      }
+      #right img{
+        width: 32px;
+        height: 32px;
+        margin: 2px;
+        cursor:pointer;
+      }
+      .selected{
+        border: 2px solid red;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <h1>Design Your Own Hogwarts!</h1>
+
+    <div id="left">
+      
+      <div id="icons" >
+
+      </div>
+    </div>
+  
+    <div id="text">
+    <p>Select a tile below and then click on the map on the left to place it</p>
+    </div>
+    <div id="right">
+
+    </div>
+    <!-- load in the image array file - this makes available a new array of all image filenames that you can use for this project -->
+    <!-- Assets courtesy of Crawl Stone Soup: https://github.com/crawl/tiles -->
+    <script src="image_array.js"></script>
+    <script>    
+        let selectedImage = null;
+        let icons = [];
+        for(let i = 0; i < array_library.length; i++){
+          const img = document.createElement("img");
+          img.src = array_library[i];
+          img.addEventListener("click", () =>{
+
+
+              selectedImage = img.src;
+              const images = document.querySelectorAll("#right img");
+              for(let j = 0; j < images.length; j++){
+                images[j].classList.remove("selected");
+              }
+            img.classList.add("selected");
+          });
+          document.getElementById("right").appendChild(img);
+        }
+
+        for(let i =0; i < 100; i++){
+          const icon = document.createElement("div");
+          icon.classList.add("icon");
+          icon.addEventListener("click", () =>{
+
+            icon.style.backgroundImage = `url('${selectedImage}')`;
+          });
+          icons.push(icon);
+          document.getElementById("icons").appendChild(icon);
+        }
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,14 @@
+<h1>Submit an image</h1>
+<form action="/submit" method="post" enctype="multipart/form-data">
+  <label for="name">Name:</label>
+  <input type="text" name="name" id="name" required />
+  <br />
+  <label for="message">Message:</label>
+  <textarea name="message" id="message" required></textarea>
+  <br />
+  <label for="image">Submit a Flick:</label>
+  <input type="file" name="image" id="image" required />
+  <br />
+  <input type="submit" value="Submit" />
+</form>
+<a href="/">Home</a> | <a href="/about">About</a> | <a href="/contact">Contact</a>

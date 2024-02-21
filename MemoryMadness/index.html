@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Memory Matching Madness</title>
+        <style>
+            body {
+                background-color: black;
+                color: white;
+                text-align: center;
+            }
+            .hidden {
+                display: none;
+            }
+            #tile_container {
+                width: 400px;
+                margin: auto;
+            }
+            #tile_container img {
+                width: 100px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Memory Matching Madness</h1>
+
+        <div id="panel_gamestart">
+            <p>Let's play! click to begin!</p>
+            <button id="button_playgame">Play Game</button>
+        </div>
+        <div id="choose_difficulty" class = "hidden">
+            <button id="medium">Medium</button>
+            <button id="easy">Easy</button>
+            <button id="hard">Hard</button>
+        </div>
+        <div id="panel_gameplaying" class="hidden">
+            <div id="timer_container">0 seconds elapsed</div>
+            <div id="tile_container"></div>
+        </div>
+        <div id="panel_gameover" class="hidden">
+            <p>Game over!</p>
+            <p id="your_time">Your time: 0 sec</p>
+            <p id="best_time">Best time: 0 sec</p>
+            <button id="reset">Play Again</button>
+            <div id="newScore" class="hidden">
+                <p>Congratulations you got a new high score! Enter your name!</p>
+                <form>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name"><br>
+    
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+
+        <script>
+             // DOM queries
+            const panel_gamestart = document.querySelector('#panel_gamestart');
+            const button_playgame = document.querySelector('#button_playgame');
+            const panel_gameplaying = document.querySelector('#panel_gameplaying');
+            const timer_container = document.querySelector('#timer_container');
+            const tile_container = document.querySelector('#tile_container');
+            const panel_gameover = document.querySelector('#panel_gameover');
+            const your_time = document.querySelector("#your_time");
+            const best_time = document.querySelector("#best_time");
+            const reset = document.querySelector("#reset");
+            const medium = document.querySelector("#medium");
+            const choose_difficulty = document.querySelector("#choose_difficulty");
+            const form = document.querySelector('form');
+            const nameInput = document.getElementById('name');
+            const names = nameInput.value;
+
+            // global variables to keep track of our picked tiles
+            let tile1 = false;
+            let tile2 = false;
+            let matches = 0;
+            let myTime = 0;
+            let bestTime = localStorage.getItem('bestTime');
+            let storedname = localStorage.getItem('name');
+            let difficulty = "";
+
+            button_playgame.onclick = function(e) {
+                panel_gamestart.classList.add('hidden');
+                choose_difficulty.classList.remove('hidden');
+
+                medium.addEventListener('click', function() {
+                    difficulty = "medium";
+                    choose_difficulty.classList.add('hidden');
+                    panel_gameplaying.classList.remove('hidden');
+                    let startTime = Date.now(); // Get the start time of the game
+                        let elapsedTime = 0; // Initialize elapsed time to 0
+
+                        // Update the elapsed time every second
+                        let timerInterval = setInterval(function() {
+                        elapsedTime = Date.now() - startTime; // Calculate the elapsed time in milliseconds
+                        // Update the timer display with the elapsed time
+                        myTime = Math.floor(elapsedTime / 1000);
+                        timer_container.innerHTML = myTime + " seconds have elapsed";
+                        }, 1000); // Update the timer every 1000 milliseconds (i.e. every second)
+
+                let assets = ['snorlax.png', 'electrabuzz.png', 'chansey.png', 'oddish.png',
+                            'pikachu.png', 'paras.png', 'arcanine.png', 'ponita.png',
+                            'venonat.png', 'eggsecute.png', 'machop.png', 'pidgey.png',
+                            'psyduck.png', 'tauros.png', 'vulpix.png', 'gloom.png',
+                            'krabby.png', 'butterfree.png', 'bulbasaur.png', 'clefairy.png',
+                            'koffing.png', 'goldeen.png', 'magikarp.png', 'beedrill.png',
+                            'lapras.png', 'meowth.png', 'ekans.png', 'jigglypuff.png',
+                            'horsea.png', 'polywog.png', 'sandshrew.png', 'rattata.png',
+                            'gengar.png', 'eevee.png', 'bellsprout.png', 'squirtle.png',
+                            'seel.png', 'caterpie.png'];
+
+                // pick 6 graphics at random
+                let selectedTiles = [];
+
+
+                while (selectedTiles.length < 20) {
+                    // pick a random one from the assets array
+                    let i = parseInt( Math.random() * assets.length );
+                    selectedTiles.push( assets[i] );
+                    selectedTiles.push( assets[i] );
+                    assets.splice(i, 1);
+                }
+
+                console.log(selectedTiles);
+
+                // you need to randomize these tiles so they are all messed up
+                selectedTiles = selectedTiles.sort(() => Math.random() - 0.5);
+
+                // create tiles for these graphics
+                for (let i = 0; i < selectedTiles.length; i++) {
+                    // create a tile
+                    let tile = document.createElement('img');
+                    tile.src = 'images/pokeball.png';
+                    tile.dataset.secret = 'images/' + selectedTiles[i];
+                    tile_container.appendChild(tile);
+
+                    // set up event listeners on each tile
+                    tile.onclick = function(event) {
+
+                        // have no tiles been clicked?
+                        if (tile1 == false && tile2 == false) {
+                            // reveal tile 1
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile1 = event.currentTarget;
+                        }
+                        else if (tile2 == false) {
+                            // reveal this tile
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile2 = event.currentTarget;
+
+                            // did they get it right?
+                            if (tile1.dataset.secret == tile2.dataset.secret) {
+                                // reset the game back to the original state and allow more clicks
+                                tile1 = false;
+                                tile2 = false;
+                                console.log("MATCH");
+                                matches ++;
+                                if(matches == 10){
+                                    panel_gameover.classList.remove('hidden');
+                                    clearInterval(timerInterval); // Stop the time
+                                    your_time.innerHTML = "Your time: " + myTime + " sec";
+
+                                    // Get the best time from localStorage or set it to a huge value if it doesn't exist
+                                    if (!bestTime) {
+                                    bestTime = 999999;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+
+                                    // When the game is completed and the player's time is less than the best time, update the best time in localStorage
+                                    if (myTime < bestTime) {
+    
+                                    bestTime = myTime;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    localStorage.setItem('storedName', name)
+
+                                    }
+                                    // Display the best time to the player
+                                    else{
+                                    best_time.innerHTML = "Best time " + bestTime + " sec";
+                                    }
+
+                                }   
+                            }
+                            else {
+                                // they got it wrong
+                                setTimeout( function() {
+                                    tile1.src = 'images/pokeball.png';
+                                    tile2.src = 'images/pokeball.png';
+                                    tile1 = false;
+                                    tile2 = false;
+                                }, 1000);
+                            }
+                        }
+
+
+
+                        //tile.src = tile.dataset.secret;
+                    }
+                }
+                });
+                easy.addEventListener('click', function() {
+                    difficulty = "medium";
+                    choose_difficulty.classList.add('hidden');
+                    panel_gameplaying.classList.remove('hidden');
+                    let startTime = Date.now(); // Get the start time of the game
+                        let elapsedTime = 0; // Initialize elapsed time to 0
+
+                        // Update the elapsed time every second
+                        let timerInterval = setInterval(function() {
+                        elapsedTime = Date.now() - startTime; // Calculate the elapsed time in milliseconds
+                        // Update the timer display with the elapsed time
+                        myTime = Math.floor(elapsedTime / 1000);
+                        timer_container.innerHTML = myTime + " seconds have elapsed";
+                        }, 1000); // Update the timer every 1000 milliseconds (i.e. every second)
+
+                let assets = ['snorlax.png', 'electrabuzz.png', 'chansey.png', 'oddish.png',
+                            'pikachu.png', 'paras.png', 'arcanine.png', 'ponita.png',
+                            'venonat.png', 'eggsecute.png', 'machop.png', 'pidgey.png',
+                            'psyduck.png', 'tauros.png', 'vulpix.png', 'gloom.png',
+                            'krabby.png', 'butterfree.png', 'bulbasaur.png', 'clefairy.png',
+                            'koffing.png', 'goldeen.png', 'magikarp.png', 'beedrill.png',
+                            'lapras.png', 'meowth.png', 'ekans.png', 'jigglypuff.png',
+                            'horsea.png', 'polywog.png', 'sandshrew.png', 'rattata.png',
+                            'gengar.png', 'eevee.png', 'bellsprout.png', 'squirtle.png',
+                            'seel.png', 'caterpie.png'];
+
+                // pick 6 graphics at random
+                let selectedTiles = [];
+
+
+                while (selectedTiles.length < 12) {
+                    // pick a random one from the assets array
+                    let i = parseInt( Math.random() * assets.length );
+                    selectedTiles.push( assets[i] );
+                    selectedTiles.push( assets[i] );
+                    assets.splice(i, 1);
+                }
+
+                console.log(selectedTiles);
+
+                // you need to randomize these tiles so they are all messed up
+                selectedTiles = selectedTiles.sort(() => Math.random() - 0.5);
+
+                // create tiles for these graphics
+                for (let i = 0; i < selectedTiles.length; i++) {
+                    // create a tile
+                    let tile = document.createElement('img');
+                    tile.src = 'images/pokeball.png';
+                    tile.dataset.secret = 'images/' + selectedTiles[i];
+                    tile_container.appendChild(tile);
+
+                    // set up event listeners on each tile
+                    tile.onclick = function(event) {
+
+                        // have no tiles been clicked?
+                        if (tile1 == false && tile2 == false) {
+                            // reveal tile 1
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile1 = event.currentTarget;
+                        }
+                        else if (tile2 == false) {
+                            // reveal this tile
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile2 = event.currentTarget;
+
+                            // did they get it right?
+                            if (tile1.dataset.secret == tile2.dataset.secret) {
+                                // reset the game back to the original state and allow more clicks
+                                tile1 = false;
+                                tile2 = false;
+                                console.log("MATCH");
+                                matches ++;
+                                if(matches == 6){
+                                    panel_gameover.classList.remove('hidden');
+                                    clearInterval(timerInterval); // Stop the time
+                                    your_time.innerHTML = "Your time: " + myTime + " sec";
+
+                                    // Get the best time from localStorage or set it to a huge value if it doesn't exist
+                                    if (!bestTime) {
+                                    bestTime = 999999;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+
+                                    // When the game is completed and the player's time is less than the best time, update the best time in localStorage
+                                    if (myTime < bestTime) {
+                                    bestTime = myTime;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+                                    // Display the best time to the player
+                                    best_time.innerHTML = "Best time " + bestTime + " sec";
+
+                                }   
+                            }
+                            else {
+                                // they got it wrong
+                                setTimeout( function() {
+                                    tile1.src = 'images/pokeball.png';
+                                    tile2.src = 'images/pokeball.png';
+                                    tile1 = false;
+                                    tile2 = false;
+                                }, 1000);
+                            }
+                        }
+
+
+
+                        //tile.src = tile.dataset.secret;
+                    }
+                }
+                });
+                hard.addEventListener('click', function() {
+                    difficulty = "medium";
+                    choose_difficulty.classList.add('hidden');
+                    panel_gameplaying.classList.remove('hidden');
+                    let startTime = Date.now(); // Get the start time of the game
+                        let elapsedTime = 0; // Initialize elapsed time to 0
+
+                        // Update the elapsed time every second
+                        let timerInterval = setInterval(function() {
+                        elapsedTime = Date.now() - startTime; // Calculate the elapsed time in milliseconds
+                        // Update the timer display with the elapsed time
+                        myTime = Math.floor(elapsedTime / 1000);
+                        timer_container.innerHTML = myTime + " seconds have elapsed";
+                        }, 1000); // Update the timer every 1000 milliseconds (i.e. every second)
+
+                let assets = ['snorlax.png', 'electrabuzz.png', 'chansey.png', 'oddish.png',
+                            'pikachu.png', 'paras.png', 'arcanine.png', 'ponita.png',
+                            'venonat.png', 'eggsecute.png', 'machop.png', 'pidgey.png',
+                            'psyduck.png', 'tauros.png', 'vulpix.png', 'gloom.png',
+                            'krabby.png', 'butterfree.png', 'bulbasaur.png', 'clefairy.png',
+                            'koffing.png', 'goldeen.png', 'magikarp.png', 'beedrill.png',
+                            'lapras.png', 'meowth.png', 'ekans.png', 'jigglypuff.png',
+                            'horsea.png', 'polywog.png', 'sandshrew.png', 'rattata.png',
+                            'gengar.png', 'eevee.png', 'bellsprout.png', 'squirtle.png',
+                            'seel.png', 'caterpie.png'];
+
+                // pick 6 graphics at random
+                let selectedTiles = [];
+
+
+                while (selectedTiles.length < 30) {
+                    // pick a random one from the assets array
+                    let i = parseInt( Math.random() * assets.length );
+                    selectedTiles.push( assets[i] );
+                    selectedTiles.push( assets[i] );
+                    assets.splice(i, 1);
+                }
+
+                console.log(selectedTiles);
+
+                // you need to randomize these tiles so they are all messed up
+                selectedTiles = selectedTiles.sort(() => Math.random() - 0.5);
+
+                // create tiles for these graphics
+                for (let i = 0; i < selectedTiles.length; i++) {
+                    // create a tile
+                    let tile = document.createElement('img');
+                    tile.src = 'images/pokeball.png';
+                    tile.dataset.secret = 'images/' + selectedTiles[i];
+                    tile_container.appendChild(tile);
+
+                    // set up event listeners on each tile
+                    tile.onclick = function(event) {
+
+                        // have no tiles been clicked?
+                        if (tile1 == false && tile2 == false) {
+                            // reveal tile 1
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile1 = event.currentTarget;
+                        }
+                        else if (tile2 == false) {
+                            // reveal this tile
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile2 = event.currentTarget;
+
+                            // did they get it right?
+                            if (tile1.dataset.secret == tile2.dataset.secret) {
+                                // reset the game back to the original state and allow more clicks
+                                tile1 = false;
+                                tile2 = false;
+                                console.log("MATCH");
+                                matches ++;
+                                if(matches == 15){
+                                    panel_gameover.classList.remove('hidden');
+                                    clearInterval(timerInterval); // Stop the time
+                                    your_time.innerHTML = "Your time: " + myTime + " sec";
+
+                                    // Get the best time from localStorage or set it to a huge value if it doesn't exist
+                                    if (!bestTime) {
+                                    bestTime = 999999;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+
+                                    // When the game is completed and the player's time is less than the best time, update the best time in localStorage
+                                    if (myTime < bestTime) {
+                                    bestTime = myTime;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+                                    // Display the best time to the player
+                                    best_time.innerHTML = "Best time " + bestTime + " sec";
+
+                                }   
+                            }
+                            else {
+                                // they got it wrong
+                                setTimeout( function() {
+                                    tile1.src = 'images/pokeball.png';
+                                    tile2.src = 'images/pokeball.png';
+                                    tile1 = false;
+                                    tile2 = false;
+                                }, 1000);
+                            }
+                        }
+
+
+
+                        //tile.src = tile.dataset.secret;
+                    }
+                }
+                });
+
+            }
+
+            reset.onclick = function(e) {
+
+                tile_container.innerHTML = "";
+                choose_difficulty.classList.remove('hidden');
+                panel_gameover.classList.add('hidden');
+                panel_gameplaying.classList.add('hidden');
+                medium.addEventListener('click', function() {
+                    difficulty = "medium";
+                    choose_difficulty.classList.add('hidden');
+                    panel_gameplaying.classList.remove('hidden');
+                    let startTime = Date.now(); // Get the start time of the game
+                        let elapsedTime = 0; // Initialize elapsed time to 0
+
+                        // Update the elapsed time every second
+                        let timerInterval = setInterval(function() {
+                        elapsedTime = Date.now() - startTime; // Calculate the elapsed time in milliseconds
+                        // Update the timer display with the elapsed time
+                        myTime = Math.floor(elapsedTime / 1000);
+                        timer_container.innerHTML = myTime + " seconds have elapsed";
+                        }, 1000); // Update the timer every 1000 milliseconds (i.e. every second)
+
+                let assets = ['snorlax.png', 'electrabuzz.png', 'chansey.png', 'oddish.png',
+                            'pikachu.png', 'paras.png', 'arcanine.png', 'ponita.png',
+                            'venonat.png', 'eggsecute.png', 'machop.png', 'pidgey.png',
+                            'psyduck.png', 'tauros.png', 'vulpix.png', 'gloom.png',
+                            'krabby.png', 'butterfree.png', 'bulbasaur.png', 'clefairy.png',
+                            'koffing.png', 'goldeen.png', 'magikarp.png', 'beedrill.png',
+                            'lapras.png', 'meowth.png', 'ekans.png', 'jigglypuff.png',
+                            'horsea.png', 'polywog.png', 'sandshrew.png', 'rattata.png',
+                            'gengar.png', 'eevee.png', 'bellsprout.png', 'squirtle.png',
+                            'seel.png', 'caterpie.png'];
+
+                // pick 6 graphics at random
+                let selectedTiles = [];
+
+
+                while (selectedTiles.length < 20) {
+                    // pick a random one from the assets array
+                    let i = parseInt( Math.random() * assets.length );
+                    selectedTiles.push( assets[i] );
+                    selectedTiles.push( assets[i] );
+                    assets.splice(i, 1);
+                }
+
+                console.log(selectedTiles);
+
+                // you need to randomize these tiles so they are all messed up
+                selectedTiles = selectedTiles.sort(() => Math.random() - 0.5);
+
+                // create tiles for these graphics
+                for (let i = 0; i < selectedTiles.length; i++) {
+                    // create a tile
+                    let tile = document.createElement('img');
+                    tile.src = 'images/pokeball.png';
+                    tile.dataset.secret = 'images/' + selectedTiles[i];
+                    tile_container.appendChild(tile);
+
+                    // set up event listeners on each tile
+                    tile.onclick = function(event) {
+
+                        // have no tiles been clicked?
+                        if (tile1 == false && tile2 == false) {
+                            // reveal tile 1
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile1 = event.currentTarget;
+                        }
+                        else if (tile2 == false) {
+                            // reveal this tile
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile2 = event.currentTarget;
+
+                            // did they get it right?
+                            if (tile1.dataset.secret == tile2.dataset.secret) {
+                                // reset the game back to the original state and allow more clicks
+                                tile1 = false;
+                                tile2 = false;
+                                console.log("MATCH");
+                                matches ++;
+                                if(matches == 10){
+                                    panel_gameover.classList.remove('hidden');
+                                    clearInterval(timerInterval); // Stop the time
+                                    your_time.innerHTML = "Your time: " + myTime + " sec";
+
+                                    // Get the best time from localStorage or set it to a huge value if it doesn't exist
+                                    if (!bestTime) {
+                                    bestTime = 999999;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+
+                                    // When the game is completed and the player's time is less than the best time, update the best time in localStorage
+                                    if (myTime < bestTime) {
+                                    bestTime = myTime;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+                                    // Display the best time to the player
+                                    best_time.innerHTML = "Best time " + bestTime + " sec";
+
+                                }   
+                            }
+                            else {
+                                // they got it wrong
+                                setTimeout( function() {
+                                    tile1.src = 'images/pokeball.png';
+                                    tile2.src = 'images/pokeball.png';
+                                    tile1 = false;
+                                    tile2 = false;
+                                }, 1000);
+                            }
+                        }
+
+
+
+                        //tile.src = tile.dataset.secret;
+                    }
+                }
+                });
+                easy.addEventListener('click', function() {
+                    difficulty = "medium";
+                    choose_difficulty.classList.add('hidden');
+                    panel_gameplaying.classList.remove('hidden');
+                    let startTime = Date.now(); // Get the start time of the game
+                        let elapsedTime = 0; // Initialize elapsed time to 0
+
+                        // Update the elapsed time every second
+                        let timerInterval = setInterval(function() {
+                        elapsedTime = Date.now() - startTime; // Calculate the elapsed time in milliseconds
+                        // Update the timer display with the elapsed time
+                        myTime = Math.floor(elapsedTime / 1000);
+                        timer_container.innerHTML = myTime + " seconds have elapsed";
+                        }, 1000); // Update the timer every 1000 milliseconds (i.e. every second)
+
+                let assets = ['snorlax.png', 'electrabuzz.png', 'chansey.png', 'oddish.png',
+                            'pikachu.png', 'paras.png', 'arcanine.png', 'ponita.png',
+                            'venonat.png', 'eggsecute.png', 'machop.png', 'pidgey.png',
+                            'psyduck.png', 'tauros.png', 'vulpix.png', 'gloom.png',
+                            'krabby.png', 'butterfree.png', 'bulbasaur.png', 'clefairy.png',
+                            'koffing.png', 'goldeen.png', 'magikarp.png', 'beedrill.png',
+                            'lapras.png', 'meowth.png', 'ekans.png', 'jigglypuff.png',
+                            'horsea.png', 'polywog.png', 'sandshrew.png', 'rattata.png',
+                            'gengar.png', 'eevee.png', 'bellsprout.png', 'squirtle.png',
+                            'seel.png', 'caterpie.png'];
+
+                // pick 6 graphics at random
+                let selectedTiles = [];
+
+
+                while (selectedTiles.length < 12) {
+                    // pick a random one from the assets array
+                    let i = parseInt( Math.random() * assets.length );
+                    selectedTiles.push( assets[i] );
+                    selectedTiles.push( assets[i] );
+                    assets.splice(i, 1);
+                }
+
+                console.log(selectedTiles);
+
+                // you need to randomize these tiles so they are all messed up
+                selectedTiles = selectedTiles.sort(() => Math.random() - 0.5);
+
+                // create tiles for these graphics
+                for (let i = 0; i < selectedTiles.length; i++) {
+                    // create a tile
+                    let tile = document.createElement('img');
+                    tile.src = 'images/pokeball.png';
+                    tile.dataset.secret = 'images/' + selectedTiles[i];
+                    tile_container.appendChild(tile);
+
+                    // set up event listeners on each tile
+                    tile.onclick = function(event) {
+
+                        // have no tiles been clicked?
+                        if (tile1 == false && tile2 == false) {
+                            // reveal tile 1
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile1 = event.currentTarget;
+                        }
+                        else if (tile2 == false) {
+                            // reveal this tile
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile2 = event.currentTarget;
+
+                            // did they get it right?
+                            if (tile1.dataset.secret == tile2.dataset.secret) {
+                                // reset the game back to the original state and allow more clicks
+                                tile1 = false;
+                                tile2 = false;
+                                console.log("MATCH");
+                                matches ++;
+                                if(matches == 6){
+                                    panel_gameover.classList.remove('hidden');
+                                    clearInterval(timerInterval); // Stop the time
+                                    your_time.innerHTML = "Your time: " + myTime + " sec";
+
+                                    // Get the best time from localStorage or set it to a huge value if it doesn't exist
+                                    if (!bestTime) {
+                                    bestTime = 999999;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+
+                                    // When the game is completed and the player's time is less than the best time, update the best time in localStorage
+                                    if (myTime < bestTime) {
+                                    bestTime = myTime;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+                                    // Display the best time to the player
+                                    best_time.innerHTML = "Best time " + bestTime + " sec";
+
+                                }   
+                            }
+                            else {
+                                // they got it wrong
+                                setTimeout( function() {
+                                    tile1.src = 'images/pokeball.png';
+                                    tile2.src = 'images/pokeball.png';
+                                    tile1 = false;
+                                    tile2 = false;
+                                }, 1000);
+                            }
+                        }
+
+
+
+                        //tile.src = tile.dataset.secret;
+                    }
+                }
+                });
+                hard.addEventListener('click', function() {
+                    difficulty = "medium";
+                    choose_difficulty.classList.add('hidden');
+                    panel_gameplaying.classList.remove('hidden');
+                    let startTime = Date.now(); // Get the start time of the game
+                        let elapsedTime = 0; // Initialize elapsed time to 0
+
+                        // Update the elapsed time every second
+                        let timerInterval = setInterval(function() {
+                        elapsedTime = Date.now() - startTime; // Calculate the elapsed time in milliseconds
+                        // Update the timer display with the elapsed time
+                        myTime = Math.floor(elapsedTime / 1000);
+                        timer_container.innerHTML = myTime + " seconds have elapsed";
+                        }, 1000); // Update the timer every 1000 milliseconds (i.e. every second)
+
+                let assets = ['snorlax.png', 'electrabuzz.png', 'chansey.png', 'oddish.png',
+                            'pikachu.png', 'paras.png', 'arcanine.png', 'ponita.png',
+                            'venonat.png', 'eggsecute.png', 'machop.png', 'pidgey.png',
+                            'psyduck.png', 'tauros.png', 'vulpix.png', 'gloom.png',
+                            'krabby.png', 'butterfree.png', 'bulbasaur.png', 'clefairy.png',
+                            'koffing.png', 'goldeen.png', 'magikarp.png', 'beedrill.png',
+                            'lapras.png', 'meowth.png', 'ekans.png', 'jigglypuff.png',
+                            'horsea.png', 'polywog.png', 'sandshrew.png', 'rattata.png',
+                            'gengar.png', 'eevee.png', 'bellsprout.png', 'squirtle.png',
+                            'seel.png', 'caterpie.png'];
+
+                // pick 6 graphics at random
+                let selectedTiles = [];
+
+
+                while (selectedTiles.length < 30) {
+                    // pick a random one from the assets array
+                    let i = parseInt( Math.random() * assets.length );
+                    selectedTiles.push( assets[i] );
+                    selectedTiles.push( assets[i] );
+                    assets.splice(i, 1);
+                }
+
+                console.log(selectedTiles);
+
+                // you need to randomize these tiles so they are all messed up
+                selectedTiles = selectedTiles.sort(() => Math.random() - 0.5);
+
+                // create tiles for these graphics
+                for (let i = 0; i < selectedTiles.length; i++) {
+                    // create a tile
+                    let tile = document.createElement('img');
+                    tile.src = 'images/pokeball.png';
+                    tile.dataset.secret = 'images/' + selectedTiles[i];
+                    tile_container.appendChild(tile);
+
+                    // set up event listeners on each tile
+                    tile.onclick = function(event) {
+
+                        // have no tiles been clicked?
+                        if (tile1 == false && tile2 == false) {
+                            // reveal tile 1
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile1 = event.currentTarget;
+                        }
+                        else if (tile2 == false) {
+                            // reveal this tile
+
+                            // switch graphics
+                            event.currentTarget.src = event.currentTarget.dataset.secret;
+
+                            // mark this as tile1
+                            tile2 = event.currentTarget;
+
+                            // did they get it right?
+                            if (tile1.dataset.secret == tile2.dataset.secret) {
+                                // reset the game back to the original state and allow more clicks
+                                tile1 = false;
+                                tile2 = false;
+                                console.log("MATCH");
+                                matches ++;
+                                if(matches == 15){
+                                    panel_gameover.classList.remove('hidden');
+                                    clearInterval(timerInterval); // Stop the time
+                                    your_time.innerHTML = "Your time: " + myTime + " sec";
+
+                                    // Get the best time from localStorage or set it to a huge value if it doesn't exist
+                                    if (!bestTime) {
+                                    bestTime = 999999;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+
+                                    // When the game is completed and the player's time is less than the best time, update the best time in localStorage
+                                    if (myTime < bestTime) {
+                                    bestTime = myTime;
+                                    localStorage.setItem('bestTime', bestTime);
+                                    }
+                                    // Display the best time to the player
+                                    best_time.innerHTML = "Best time " + bestTime + " sec";
+
+                                }   
+                            }
+                            else {
+                                // they got it wrong
+                                setTimeout( function() {
+                                    tile1.src = 'images/pokeball.png';
+                                    tile2.src = 'images/pokeball.png';
+                                    tile1 = false;
+                                    tile2 = false;
+                                }, 1000);
+                            }
+                        }
+
+
+
+                        //tile.src = tile.dataset.secret;
+                    }
+                }
+                });
+
+            }
+            
+        </script>
+    </body>
+</html>

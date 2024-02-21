@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Macro Assignment 03: Gotta Catch 'em All!</title>
+        <style>
+            #left {
+                float: left;
+                width: 800px;
+                height: 600px;
+                position: relative;
+                margin-right: 20px;
+            }
+            #background {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                width: 100%;
+            }
+            #grass1 {
+                position: absolute;
+                left: 0px;
+                bottom: 0px;
+            }
+            #grass2 {
+                position: absolute;
+                left: 275px;
+                bottom: 0px;
+            }
+            #grass3 {
+                position: absolute;
+                right: 0px;
+                bottom: 0px;
+            }
+            .grass:hover {
+                background-color: rgba(255, 255, 0, 0.5);
+            }
+            #history > p{
+                color: peru;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="left">
+            <img id="background" src="images/environment_forestbackground.png">
+            <img class="grass" id="grass1" src="images/grass.png">
+            <img class="grass" id="grass2" src="images/grass.png">
+            <img class="grass" id="grass3" src="images/grass.png">
+        </div>
+        <div id="right">
+            <h1>Gotta Catch 'em All!</h1>
+            <p>Instructions</p>
+            <h2 id="status">Click a grass</h2>
+            <div id="pokemon_caught_div">Caught: 0</div>
+            <div id="pokeballs_left_div">Pokeballs: 5</div>
+            <button id="play_again_button" style="display: none;">Play Again!</button>
+        </div>
+        <p>Result History: </p>
+        <div id="history">
+            <a href="">
+                <button id="start_over_button">Start Over!</button>
+            </a>
+        </div>
+
+        <script>
+            // set up DOM queries for all the things we plan on using
+            const grass1 = document.getElementById('grass1');
+            const grass2 = document.getElementById('grass2');
+            const grass3 = document.getElementById('grass3');
+            const grassyPatches = document.querySelectorAll('.grass');
+            const history = document.getElementById('history');
+            const pokemon_caught_div = document.getElementById('pokemon_caught_div');
+            const pokeballs_left_div = document.getElementById('pokeballs_left_div');
+            const play_again_button = document.getElementById('play_again_button');
+
+            // possible pokemon
+            const pokemon = [
+                {name:'Pikachu', image:'images/pikachu.png'}, 
+                {name:'Bulbasaur', image:'images/bulbasaur.png'},
+                {name:'Charmander', image:'images/charmander.png'},
+                {name:'Eevee', image:'images/eevee.png'},
+                {name:'Squirtle', image:'images/squirtle.png'}
+            ]
+
+            const superItems = [
+                {name:'Pokeball', image:'images/pokeball4.png'}, 
+                {name:'Mewtwo', image:'images/mewtwo.png'},
+                {name:'Virizion', image:'images/virizion.png'},
+            ]
+
+            // create some variables to keep track of our game state logic
+            let pokeballsRemaining = 5;
+            let caught = 0;
+            let gameInProgress = true;
+            
+            grass1.addEventListener("click", function grassOne() {
+                const pElement = document.createElement('p');
+                if(gameInProgress == true){
+                    // reduce the # of pokeballs
+                    pokeballsRemaining -= 1;
+
+                    // generate a chance variable
+                    let chance = parseInt( Math.random() * 3 ); // 0, 1 or 2
+                    let pokeNum = parseInt( Math.random() * pokemon.length);
+                    let superItem = parseInt( Math.random() * 5);
+                    let superNum = parseInt( Math.random() * superItems.length);
+                    
+            
+
+                    // more pokeballs
+                    if (chance == 0) {
+                        grass1.src = 'images/pokeballs.png';
+                        pokeballsRemaining += 2;
+                        pElement.textContent = 'you caught two pokeballs.';
+                        history.insertBefore(pElement, history.firstChild);
+                    }
+                    // nothing happens
+                    else if (chance == 1) {
+                        grass1.src = '';
+                        pElement.textContent = 'you caught nothing.';
+                        history.insertBefore(pElement, history.firstChild);
+                    }
+                    else if (superItem == 2 && chance == 2) {
+                        const randSuper = superItems[superNum];
+                        grass1.src = randSuper.image;
+                        caught += 1;
+                        pElement.textContent = 'you caught a ' + randSuper.name;
+                        history.insertBefore(pElement, history.firstChild);
+                        alert('You are in super item mode');
+                    }
+                    // it's a pokemon
+                    else {
+                        const randPoke = pokemon[pokeNum];
+                        grass1.src = randPoke.image;
+                        caught += 1;
+                        alert('You caught a pokemon')
+                        pElement.textContent = 'you caught a ' + randPoke.name;
+                        history.insertBefore(pElement, history.firstChild);
+                    }
+
+                    // round is over, update the pokeballs left indicator
+                    pokeballs_left_div.innerHTML = 'Pokeballs: ' + pokeballsRemaining;
+                    pokemon_caught_div.innerHTML = 'Caught: ' + caught;
+
+                    // make the play againn button visible
+                    play_again_button.style.display = 'block';
+                    gameInProgress = false;
+                }  
+            });
+
+            grass2.addEventListener("click", function grassTwo() {
+                const pElement = document.createElement('p');
+                if(gameInProgress == true){
+                    // reduce the # of pokeballs
+                    pokeballsRemaining -= 1;
+
+                    // generate a chance variable
+                    let chance = parseInt( Math.random() * 3 ); // 0, 1 or 2
+                    let pokeNum = parseInt( Math.random() * pokemon.length);
+                    let superItem = parseInt( Math.random() * 5);
+                    let superNum = parseInt( Math.random() * superItems.length);
+                    
+            
+
+                    // more pokeballs
+                    if (chance == 0) {
+                        grass2.src = 'images/pokeballs.png';
+                        pokeballsRemaining += 2;
+                        pElement.textContent = 'you caught two pokeballs.';
+                        history.insertBefore(pElement, history.firstChild);
+                    }
+                    // nothing happens
+                    else if (chance == 1) {
+                        grass2.src = '';
+                        pElement.textContent = 'you caught nothing.';
+                        history.insertBefore(pElement, history.firstChild);
+                    }
+                    else if (superItem == 2 && chance == 2) {
+                        const randSuper = superItems[superNum];
+                        grass2.src = randSuper.image;
+                        caught += 1;
+                        pElement.textContent = 'you caught a ' + randSuper.name;
+                        history.insertBefore(pElement, history.firstChild);
+                        alert('You are in super item mode');
+                    }
+                    // it's a pokemon
+                    else {
+                        const randPoke = pokemon[pokeNum];
+                        grass2.src = randPoke.image;
+                        caught += 1;
+                        alert('You caught a pokemon')
+                        pElement.textContent = 'you caught a ' + randPoke.name;
+                        history.insertBefore(pElement, history.firstChild);
+                    }
+
+                    // round is over, update the pokeballs left indicator
+                    pokeballs_left_div.innerHTML = 'Pokeballs: ' + pokeballsRemaining;
+                    pokemon_caught_div.innerHTML = 'Caught: ' + caught;
+
+                    // make the play againn button visible
+                    play_again_button.style.display = 'block';
+                    gameInProgress = false;
+                }  
+            });
+
+            grass3.addEventListener("click", function grassThree() {
+                const pElement = document.createElement('p');
+                if(gameInProgress == true){
+                    // reduce the # of pokeballs
+                    pokeballsRemaining -= 1;
+
+                    // generate a chance variable
+                    let chance = parseInt( Math.random() * 3 ); // 0, 1 or 2
+                    let pokeNum = parseInt( Math.random() * pokemon.length);
+                    let superItem = parseInt( Math.random() * 5);
+                    let superNum = parseInt( Math.random() * superItems.length);
+                    
+            
+
+                    // more pokeballs
+                    if (chance == 0) {
+                        grass3.src = 'images/pokeballs.png';
+                        pokeballsRemaining += 2;
+                        pElement.textContent = 'you caught two pokeballs.';
+                        history.insertBefore(pElement, history.firstChild);
+                    }
+                    // nothing happens
+                    else if (chance == 1) {
+                        grass3.src = '';
+                        pElement.textContent = 'you caught nothing.';
+                        history.insertBefore(pElement, history.firstChild);
+                    }
+                    else if (superItem == 2 && chance == 2) {
+                        const randSuper = superItems[superNum];
+                        grass3.src = randSuper.image;
+                        caught += 1;
+                        pElement.textContent = 'you caught a ' + randSuper.name;
+                        history.insertBefore(pElement, history.firstChild);
+                        alert('You are in super item mode');
+                    }
+                    // it's a pokemon
+                    else {
+                        const randPoke = pokemon[pokeNum];
+                        grass3.src = randPoke.image;
+                        caught += 1;
+                        alert('You caught a pokemon')
+                        pElement.textContent = 'you caught a ' + randPoke.name;
+                        history.insertBefore(pElement, history.firstChild);
+                    }
+
+                    // round is over, update the pokeballs left indicator
+                    pokeballs_left_div.innerHTML = 'Pokeballs: ' + pokeballsRemaining;
+                    pokemon_caught_div.innerHTML = 'Caught: ' + caught;
+
+                    // make the play againn button visible
+                    play_again_button.style.display = 'block';
+                    gameInProgress = false;
+                }  
+            });
+
+            // when the user clicks on the play again button
+            play_again_button.addEventListener("click", function playAgain() {
+                if(pokeballsRemaining > 0){
+                    // make all the grass transition back to their original graphic
+                grass1.src = 'images/grass.png';
+                grass2.src = 'images/grass.png';
+                grass3.src = 'images/grass.png';
+
+                // hide the play agian button
+                play_again_button.style.display = 'none';
+                gameInProgress = true;
+                }
+                else{
+                    alert('No more Pokeballs left! Refresh the page to play again!');
+                }
+            });
+
+        </script>
+    </body>
+</html>

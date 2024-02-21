@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Assignment 02</title>
+        <style>
+
+            #container {
+                width: 800px;
+                height: 600px;
+                margin: auto;
+                border: 5px solid black;
+                position: relative;
+                box-sizing: border-box;
+            }
+            #background {
+                width: 100%;
+                height:100%;
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                z-index: 0;
+            }
+
+            #title {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                z-index: 1;
+                color: white;
+            }
+
+            #infopanel {
+                position: absolute;
+                top: 100px;
+                left: 20px;
+                z-index: 1;
+                background-color: white;
+                opacity: 70%;
+            }
+            #body {
+                position: absolute;
+                bottom: 0px;
+                right: 200px;
+                z-index: 1;
+            }
+            #head {
+                position: absolute;
+                bottom: 278px;
+                right: 275px;
+                z-index: 1;
+            }
+
+            #decal {
+                position: absolute;
+                bottom: 275px;
+                right: 275px;
+                z-index: 1;
+            }
+
+            #luck{
+                position: absolute;
+                top: 130px;
+                left: 20px;
+                z-index: 1;
+                background-color: white;
+                opacity: 70%;
+            }
+
+        </style>
+    </head>
+    <body>
+
+        <div id="container">
+            <img id="head" src="assignment02_images/heads/head1.png">
+            <img id="body" src="assignment02_images/bodies/body1.png">
+            <img id="decal" src="">
+
+            <script>
+                let heads = ["assignment02_images/heads/head1.png", "assignment02_images/heads/head2.png", "assignment02_images/heads/head3.png","assignment02_images/heads/head4.png", "assignment02_images/heads/head5.png", "assignment02_images/heads/head6.png"];
+                let body = ["assignment02_images/bodies/body1.png","assignment02_images/bodies/body2.png","assignment02_images/bodies/body3.png","assignment02_images/bodies/body4.png","assignment02_images/bodies/body5.png","assignment02_images/bodies/body6.png"];
+                let image = document.getElementById("head");
+                let bod = document.getElementById("body");
+                let randNum = Math.floor(Math.random() * heads.length);
+                let randHead = heads[randNum];
+                let randBod = body[randNum];
+                image.src = randHead;
+                bod.src = randBod;
+
+                
+                let decals = ["assignment02_images/decals/hat.png", "assignment02_images/decals/hair.png"];
+                let dec = document.getElementById("decal");
+                let random = Math.floor(Math.random() * decals.length);
+                let randDecal = decals[random];
+                dec.src=randDecal;
+
+
+                let number;
+
+                do {
+                number = prompt("Please enter a positive number greater than or equal to 3:");
+                } while (isNaN(number) || number < 3);
+
+                console.log("You entered: " + number);
+
+                function luckyNum(num){
+                    const luck = [];
+                    for (let i = 0; i < 3; i++){
+                        let curr = Math.floor(Math.random() * num) + 1;
+                        if (!luck.includes(curr)) {
+                            luck.push(curr);
+                        }
+                        else{
+                            while(luck.includes(curr)){
+                                let curr = Math.floor(Math.random() * num) + 1;
+                            }
+                            luck.push(curr);
+                        }
+                    }
+
+                    
+                    
+                    document.write(`<div id="luck">Your luck numbers are: ${luck} </div>`);
+                }
+
+                luckyNum(number);
+
+                const words = ['Awesome', 'Fantastic', 'Fabulous', 'Superb', 'Perfect', 'Brilliant', 'Coming up Roses'];
+
+                // pick a word at random
+                let i = parseInt( Math.random() * words.length );
+                let word = words[i];
+
+                // write out the H1 tag to use that word
+                document.write(`<h1 id="title">Everything is ${word}!</h1>`);
+
+
+                
+                let rightNow = new Date();
+                let hour = rightNow.getHours();
+                let minute = rightNow.getMinutes();
+
+                
+                if(hour >= 6 && hour < 12){
+                    document.write(`<div id="infopanel">The current time is ${hour}:${minute} - Good Morning!</div>`);
+                    document.write(`<img id="background" src="assignment02_images/backgrounds/night.png">`);
+                }
+                else if(hour >= 12 && hour <18){
+                    hour -= 12;
+                    document.write(`<div id="infopanel">The current time is ${hour}:${minute} - Good Afternoon!</div>`);
+                    document.write(`<img id="background" src="assignment02_images/backgrounds/afternoon.png">`);
+                }
+                else if(hour >= 18 && hour <24){
+                    hour -= 12;
+                    document.write(`<div id="infopanel">The current time is ${hour}:${minute} - Good Evening!</div>`);
+                    document.write(`<img id="background" src="assignment02_images/backgrounds/evening.png">`);
+                }
+                else{
+                    if(hour == 0){
+                        hour = 12;
+                    }
+                    document.write(`<div id="infopanel">The current time is ${hour}:${minute} - Good Night!</div>`);
+                    document.write(`<img id="background" src="assignment02_images/backgrounds/night.png">`);
+
+                }
+                
+            </script>
+        </div>        
+
+    </body>
+</html>
